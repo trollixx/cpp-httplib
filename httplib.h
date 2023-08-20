@@ -4256,7 +4256,7 @@ public:
   MultipartFormDataParser() = default;
 
   void set_boundary(std::string &&boundary) {
-    boundary_ = boundary;
+    boundary_ = std::move(boundary);
     dash_boundary_crlf_ = dash_ + boundary_ + crlf_;
     crlf_dash_boundary_ = crlf_ + dash_ + boundary_;
   }
@@ -5219,7 +5219,7 @@ inline void Response::set_content_provider(
   set_header("Content-Type", content_type);
   content_length_ = in_length;
   if (in_length > 0) { content_provider_ = std::move(provider); }
-  content_provider_resource_releaser_ = resource_releaser;
+  content_provider_resource_releaser_ = std::move(resource_releaser);
   is_chunked_content_provider_ = false;
 }
 
@@ -6543,7 +6543,7 @@ Server::process_request(Stream &strm, bool close_connection,
   } catch (...) {
     if (exception_handler_) {
       auto ep = std::current_exception();
-      exception_handler_(req, res, ep);
+      exception_handler_(req, res, std::move(ep));
       routed = true;
     } else {
       res.status = 500;
